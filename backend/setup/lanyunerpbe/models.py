@@ -1,33 +1,41 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
-class Object(models.Model):
-  activated = models.BooleanField(default=True)
 
-class Person(Object):
+class Person(models.Model):
+  authUser = models.ForeignKey(User, on_delete=models.CASCADE)
   sn = models.CharField(max_length=128) # serial number
   sArYear = models.IntegerField(default = 1911) # school arrival year
-  name = models.CharField(max_length=64, default='xxx')
+  activated = models.BooleanField(default=False)
   def __str__(self):
-    return '{}:{}:#{}'.format(self.sArYear, self.name, self.sn)
+    return '{}:{} {}:#{}'.format(
+      self.sArYear, 
+      self.authUser.last_name, 
+      self.authUser.first_name, 
+      self.sn
+    )
   
-class ManageGroup(Object):
+class ManageGroup(models.Model):
   name = models.CharField(max_length=128)
+  activated = models.BooleanField(default=True)
   def __str__(self):
     return self.name
 
-class InstrGroup(Object):
+class InstrGroup(models.Model):
   name = models.CharField(max_length=128)
+  activated = models.BooleanField(default=True)
   def __str__(self):
     return self.name
 
-class Property(Object):
+class Property(models.Model):
   name = models.CharField(max_length=256)
   serialNum = models.CharField(max_length=2048)
   mgroup = models.ForeignKey(ManageGroup, on_delete=models.PROTECT)
   igroup = models.ForeignKey(InstrGroup, on_delete=models.PROTECT)
   borrowedBy = models.ForeignKey(Person, null=True, on_delete=models.PROTECT, blank=True)
+  activated = models.BooleanField(default=True)
   def __str__(self):
     pref = '#{}:{}:{}:{}'.format(
       self.serialNum, 
