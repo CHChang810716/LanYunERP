@@ -8,7 +8,9 @@ class Person(models.Model):
     authUser = models.ForeignKey(User, on_delete=models.CASCADE)
     sn = models.CharField(max_length=128)  # serial number
     sArYear = models.IntegerField(default=1911)  # school arrival year
-    activated = models.BooleanField(default=False)
+    canBorrow = models.BooleanField(default=False)
+    canListProperties = models.BooleanField(default=False)
+    canActiveUser = models.BooleanField(default=False)
 
     def __str__(self):
         return '{}:{} {}:#{}'.format(
@@ -21,19 +23,15 @@ class Person(models.Model):
 
 class ManageGroup(models.Model):
     name = models.CharField(max_length=128)
-    activated = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
-
 
 class InstrGroup(models.Model):
     name = models.CharField(max_length=128)
-    activated = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
-
 
 class Property(models.Model):
     name = models.CharField(max_length=256)
