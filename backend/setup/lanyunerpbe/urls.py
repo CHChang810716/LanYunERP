@@ -1,11 +1,13 @@
 from django.urls import path
-from .views import homePageView, createPerson, login, logout, personInfo, propertyList
+from . import views
 
 urlpatterns = [
-    path("", homePageView),
-    path("create_person", createPerson),
-    path("login", login),
-    path("logout", logout),
-    path("person_info", personInfo),
-    path("property_list", propertyList)
+    path("", views.homePageView),
+    path("create_person", views.createPerson),
+    path("login", views.login),
+    path("logout", views.logout),
+    path("person_info", views.personInfo),
+    path("person_list", views.personList),
+    path("property_list", views.propertyList),
+    path("property_info", views.propertyInfo),
 ]

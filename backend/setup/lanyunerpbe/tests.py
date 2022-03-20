@@ -54,10 +54,8 @@ class TestPerson(TestCase):
     def test_person_normal_flow(self):
         # create user
         create_user(self)
-
         # login
         login(self)
-
         # get user info
         response = self.client.get(
             path = '/lanyunerpbe/person_info',
@@ -114,7 +112,70 @@ class TestPerson(TestCase):
         self.assertEqual(res['data'][0]['borrowedBy'], 'user test')
 
 
+    def test_person_list(self):
+        create_user(self)
+        login(self)
+        response = self.client.get(
+            path = '/lanyunerpbe/person_list'
+        )
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        self.assertEqual(res['code'], 1)
+        logout(self)
+        user = User.objects.get(username = userData['username'])
+        person = Person.objects.get(authUser = user)
+        person.canActivateUser = True
+        person.save()
+        login(self)
+        response = self.client.get(
+            path = '/lanyunerpbe/person_list'
+        )
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        self.assertEqual(res['code'], 0)
+        self.assertEqual(len(res['data']), 1)
+        self.assertEqual(res['data'][0]['name'], 'user test')
 
-
+    def test_property_info(self):
+        mg = ManageGroup.objects.create(
+            name = '拉弦組'
+        )
+        ig = InstrGroup.objects.create(
+            name = '二胡'
+        )
+        Property.objects.create(
+            name = '二胡1',
+            serialNum = 'asdf',
+            mgroup = mg,
+            igroup = ig,
+            activated = True
+        )
+        create_user(self)
+        login(self)
+        response = self.client.get(
+            path = '/lanyunerpbe/property_info',
+            data = {
+                'serialNum': 'asdf'
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        self.assertEqual(res['code'], 1)
+        logout(self)
+        user = User.objects.get(username = userData['username'])
+        person = Person.objects.get(authUser = user)
+        person.canListProperties = True
+        person.save()
+        login(self)
+        response = self.client.get(
+            path = '/lanyunerpbe/property_info',
+            data = {
+                'serialNum': 'asdf'
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        self.assertEqual(res['code'], 0)
+        self.assertEqual(res['data']['serialNum'], 'asdf')
 
 # Create your tests here.
